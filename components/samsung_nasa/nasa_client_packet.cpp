@@ -25,27 +25,43 @@ int Packet::get_packet_number() {
 }
 
 DecodeResult Packet::decode(std::vector<uint8_t> &data) {
-  const uint16_t size = (uint16_t) data[1] << 8 | (uint16_t) data[2];
   if (data.size() < 4) {
     return {DecodeResultType::Fill};
   }
+  // Größe erst nach der Längenprüfung lesen (vorher Zugriff auf data[1..2] bei weniger als 3 Bytes)
+  const uint16_t size = (uint16_t) data[1] << 8 | (uint16_t) data[2];
   if (size > 1500) {
-    ESP_LOGW(TAG, "Packet exceeds size limits: %s", format_hex_pretty(data).c_str());
+    diag_rx_seq++;
+    diag_err_size++;
+    ESP_LOGW(TAG, "Packet exceeds size limits (n=%u, %u Bytes im Puffer)", (unsigned) diag_rx_seq, (unsigned) data.size());
+    if (debug_log_raw_bytes)
+      diag_log_raw("size", data.data(), data.size());
     return {DecodeResultType::Discard};
   }
   if (size + 2 > data.size())
     return {DecodeResultType::Fill};
   if (data[size + 1] != 0x34) {
-    ESP_LOGW(TAG, "invalid end byte: %s", format_hex_pretty(data).c_str());
+    diag_rx_seq++;
+    diag_err_end++;
+    ESP_LOGW(TAG, "invalid end byte (n=%u, Länge %u, %u Bytes im Puffer)", (unsigned) diag_rx_seq, (unsigned) (size + 2), (unsigned) data.size());
+    if (debug_log_raw_bytes)
+      diag_log_raw("end", data.data(), std::min<size_t>(data.size(), size + 2));
     return {DecodeResultType::Discard};
   }
   uint16_t crc_actual = crc16be(data.data() + 3, size - 4);
   uint16_t crc_expected = (int)data[size - 1] << 8 | (int)data[size];
   if (crc_expected != crc_actual) {
-    ESP_LOGW(TAG, "NASA: invalid crc - got %d but should be %d: %s", crc_actual, crc_expected,
-             format_hex_pretty(data).c_str());
+    diag_rx_seq++;
+    diag_err_crc++;
+    ESP_LOGW(TAG, "NASA: invalid crc - got %d but should be %d (n=%u)", crc_actual, crc_expected, (unsigned) diag_rx_seq);
+    if (debug_log_raw_bytes)
+      diag_log_raw("crc", data.data(), size + 2);
     return {DecodeResultType::Discard};
   }
+  diag_rx_seq++;
+  diag_ok++;
+  if (debug_log_raw_bytes)
+    diag_log_raw("ok", data.data(), size + 2);
   unsigned int cursor = 3;
   sa.decode(data, cursor);
   cursor += sa.size;
@@ -89,7 +105,7 @@ std::vector<uint8_t> Packet::encode() {
 std::vector<std::string> Packet::to_string(optional<std::string> prefix) {
   std::vector<std::string> lines;
   std::string line = prefix ? *prefix + " " : "";
-  line += "#Packet Src:" + sa.to_string() + " Dst:" + da.to_string() + " " + command.to_string();
+  line += "#Packet Src:" + sa.to_string() + " Dst:" + da.to_string() + " " + command.to_string() + " n=" + std::to_string(diag_rx_seq);
   lines.push_back(line);
   for (int i = 0; i < messages.size(); i++) {
     lines.push_back(" > " + messages[i].to_string());
