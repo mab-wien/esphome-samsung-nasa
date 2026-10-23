@@ -16,7 +16,7 @@ class NASA_TextSensor : public text_sensor::TextSensor, public NASA_Base {
 
   void on_receive(long value) override;
   void on_receive_structure(const uint8_t *data, uint8_t size) override;
-  // 0 = Text/Hex (Standard), 1 = Samsung-Teilenummer mit Datum „DB91-02103B 231108“, 2 = Product Option „[0]12300-…“
+  // 0 = Text/Hex (Standard), 1 = Samsung-Teilenummer mit Datum „DB91-02103B 231108“, 2 = Product Option „[0]12300-…“, 3 = Inverter-Micom (Teilenummer Bytes 0-3, Datum Bytes 8-10)
   void set_structure_format(uint8_t format) { this->structure_format_ = format; }
   void set_parent(NASA_Controller *controller);
 
