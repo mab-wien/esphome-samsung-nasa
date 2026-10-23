@@ -114,6 +114,9 @@ std::vector<std::string> Packet::to_string(optional<std::string> prefix) {
 }
 
 void Packet::log_multiline(optional<std::string> prefix, log_lines_t func) {
+  // Paketköpfe nur im Debug-Modus (im Rohbyte-Modus stehen sie bereits in der RAW-Zeile)
+  if (!debug_log_messages)
+    return;
   for (const auto &line : this->to_string(prefix)) {
     func(TAG, line.c_str());
   }
