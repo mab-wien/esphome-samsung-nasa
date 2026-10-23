@@ -18,12 +18,13 @@ from .. import (
 from ..nasa.text_sensors import text_sensors
 
 CONF_STRUCTURE_FORMAT = "structure_format"
-STRUCTURE_FORMATS = {"hex": 0, "dbcode": 1, "product_option": 2, "dbcode_inverter": 3}
+STRUCTURE_FORMATS = {"hex": 0, "dbcode": 1, "product_option": 2, "dbcode_inverter": 3, "mac": 4}
 # Vorgaben für Strukturen, deren Aufbau mit S-NET Pro 2 abgeglichen ist
 STRUCTURE_FORMAT_DEFAULTS = {
     0x0600: "product_option",  # Product Option: [0]12300-[1]10000-[2]00000-[3]00002
     0x0608: "dbcode",          # Main Micom: DB91-02103B 231108
     0x060C: "dbcode",          # EEPROM-Version: DB82-07086A 220622
+    0x061C: "mac",             # MAC-Adresse WiFi-Kit: 40:CA:63:EC:06:B5
     0x8601: "dbcode_inverter", # Inverter-Micom: DB91-02411A 100004 (Bytes 0-3 und 8-10)
 }
 
