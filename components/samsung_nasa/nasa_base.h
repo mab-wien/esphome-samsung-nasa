@@ -21,6 +21,8 @@ class NASA_Base {
   const std::string get_address() const { return this->device_->get_address(); }
   // Must implement in each component type
   virtual void on_receive(long value) = 0;
+  // Strukturen (NASA-Typ 3): Nutzdaten ohne Kennung; nur Komponenten, die das können, überschreiben dies
+  virtual void on_receive_structure(const uint8_t *data, uint8_t size) {}
 
  protected:
   const std::string label_;

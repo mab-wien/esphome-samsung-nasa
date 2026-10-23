@@ -15,6 +15,7 @@ class NASA_TextSensor : public text_sensor::TextSensor, public NASA_Base {
       : NASA_Base(label, message, nasa_mode, device) {};
 
   void on_receive(long value) override;
+  void on_receive_structure(const uint8_t *data, uint8_t size) override;
   void set_parent(NASA_Controller *controller);
 
   // Method to receive the lambda generated in text_sensor.py
@@ -24,6 +25,7 @@ class NASA_TextSensor : public text_sensor::TextSensor, public NASA_Base {
   NASA_Controller *controller_{nullptr};
   std::function<std::string(long)> lookup_func_;
   long last_numeric_value_ = -1; // Sentinel value
+  std::string last_structure_;
 };
 
 }  // namespace samsung_nasa
