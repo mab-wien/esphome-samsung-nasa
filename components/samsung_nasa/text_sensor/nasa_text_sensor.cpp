@@ -21,8 +21,10 @@ void NASA_TextSensor::on_receive_structure(const uint8_t *data, uint8_t size) {
   uint8_t n = size;
   while (n > 0 && (data[n - 1] == 0x00 || data[n - 1] == 0xFF || data[n - 1] == ' '))
     n--;
-  bool text = n >= 2;
-  for (uint8_t i = 0; i < n && text; i++)
+  // Text mit vorangestelltem Längenbyte, z. B. 0x061A: 11 'EHS MONO LOWTEMP' 00
+  uint8_t start = (n >= 3 && data[0] < 0x20 && data[0] <= size - 1) ? 1 : 0;
+  bool text = n - start >= 2;
+  for (uint8_t i = start; i < n && text; i++)
     text = data[i] >= 0x20 && data[i] < 0x7F;
   std::string s;
   char buf[48];
@@ -43,7 +45,7 @@ void NASA_TextSensor::on_receive_structure(const uint8_t *data, uint8_t size) {
     for (uint8_t g = 0; g < 4; g++)
       s += (g ? "-[" : "[") + std::to_string(g) + "]" + digits.substr(g * 5, 5);
   } else if (text) {
-    s.assign(reinterpret_cast<const char *>(data), n);
+    s.assign(reinterpret_cast<const char *>(data + start), n - start);
   } else {
     char hex[4];
     for (uint8_t i = 0; i < size; i++) {
