@@ -25,7 +25,20 @@ void NASA_TextSensor::on_receive_structure(const uint8_t *data, uint8_t size) {
   for (uint8_t i = 0; i < n && text; i++)
     text = data[i] >= 0x20 && data[i] < 0x7F;
   std::string s;
-  if (text) {
+  char buf[48];
+  if (this->structure_format_ == 1 && size >= 7) {
+    snprintf(buf, sizeof(buf), "DB%02X-%02X%02X%02X %02X%02X%02X", data[0], data[1], data[2], data[3], data[4], data[5],
+             data[6]);
+    s = buf;
+  } else if (this->structure_format_ == 2 && size >= 10) {
+    std::string digits;
+    for (uint8_t i = 0; i < 10; i++) {
+      snprintf(buf, sizeof(buf), "%02X", data[i]);
+      digits += buf;
+    }
+    for (uint8_t g = 0; g < 4; g++)
+      s += (g ? "-[" : "[") + std::to_string(g) + "]" + digits.substr(g * 5, 5);
+  } else if (text) {
     s.assign(reinterpret_cast<const char *>(data), n);
   } else {
     char hex[4];
