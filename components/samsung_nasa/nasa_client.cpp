@@ -243,6 +243,19 @@ void NASA_Client::publish_from_queue(std::vector<uint16_t> &messages) {
   this->publish_data(packet.command.packetNumber, packet.encode());
 }
 
+void NASA_Client::publish_read_to(const std::string &address, const std::vector<uint16_t> &messages) {
+  Packet packet = Packet::create_partial(Address::parse(address), DataType::Read);
+  for (const auto &message : messages) {
+    MessageSet request(message);
+    request.value = 0;
+    packet.messages.push_back(request);
+  }
+  if (packet.messages.size() == 0)
+    return;
+  packet.log_multiline(std::string("Read"), log_lines_func);
+  this->publish_data(packet.command.packetNumber, packet.encode());
+}
+
 void NASA_Client::publish_request(const std::string &address, uint16_t message, long value) {
   Packet packet = Packet::create_partial(Address::parse(address), DataType::Request);
   MessageSet message_set(message);

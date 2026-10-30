@@ -19,6 +19,7 @@ class NASA_Controller : public PollingComponent {
   void update() override;
   void write(const std::string &address, const uint16_t &number, long value);
   void read(const std::vector<uint16_t> &numbers);
+  void read_from(const std::string &address, const std::vector<uint16_t> &numbers);
   void register_device(NASA_Device *device);
   void register_component(NASA_Base *component);
   void set_debug_log_messages(bool value) { debug_log_messages = value; }
