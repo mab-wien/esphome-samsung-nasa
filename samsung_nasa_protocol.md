@@ -88,7 +88,7 @@ Structures only appear when requested (service tool, Wi-Fi kit). Payload layouts
 | Message | Source | Content | `structure_format` |
 |---|---|---|---|
 | 0x0600 | indoor | product option, hex digits in 4 groups of 5: `[0]12300-[1]10000-[2]00000-[3]00002` | `product_option` |
-| 0x0605 | outdoor | location (ASCII, e.g. `GG11`) | text |
+| 0x0605 | outdoor | location (ASCII, e.g. `AB12`) | text |
 | 0x0607 | indoor, outdoor | serial number (ASCII) | text |
 | 0x0608 | indoor, outdoor | main micom `DB91-02103B 231108` (bytes 0-6) | `dbcode` |
 | 0x060C | outdoor | EEPROM version `DB82-07086A 220622` | `dbcode` |

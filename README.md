@@ -134,7 +134,7 @@ These are the only fields you need to provide. All other fields such as unit of 
 
 ### Supported FSVs  
 
-Refer to p.24 onwards of the [MIM-E03EN user manual PDF](MIM-E03EN.pdf).
+Refer to p.24 onwards of the MIM-E03EN user manual, available from [Samsung support](https://www.samsung.com/support/) (search for MIM-E03EN).
 
 1011, 1012, 1021, 1022, 1031, 1032, 1041, 1042, 1051, 1052, 2011, 2012, 2021, 2022, 2031, 
 2032, 2051, 2052, 2061, 2062, 2071, 2072, 3021, 3022, 3023, 3024, 3025, 3026, 3032, 3033,
@@ -207,7 +207,7 @@ So for example message 0x4066 (hot water mode):
 
 ### Supported FSVs  
 
-Refer to p.24 onwards of the [MIM-E03EN user manual PDF](MIM-E03EN.pdf).
+Refer to p.24 onwards of the MIM-E03EN user manual, available from [Samsung support](https://www.samsung.com/support/) (search for MIM-E03EN).
 
 2041, 2081, 2091, 2092, 2093, 3011, 3042, 3061, 3071, 4011, 4021, 4022, 4041, 4051, 5042, 5043
 
@@ -263,7 +263,7 @@ switches = {
 
 ### Supported FSVs  
 
-Refer to p.24 onwards of the [MIM-E03EN user manual PDF](MIM-E03EN.pdf).
+Refer to p.24 onwards of the MIM-E03EN user manual, available from [Samsung support](https://www.samsung.com/support/) (search for MIM-E03EN).
 
 3031, 3041, 3051, 4023, 4031, 4032, 4061, 5022, 5041, 5051, 5081, 5091, 5094  
 
