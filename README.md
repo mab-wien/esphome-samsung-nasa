@@ -667,6 +667,46 @@ Fields checked against the labelled export of the same E438 dump from the servic
 
 Bytes not listed were 0 or constant; the second compressor and the unused unit blocks of the export are not part of this table. 0x461E returned 46 zero bytes in every read so far (also after errors), so its layout is unknown.
 
+#### 0x860B request modes
+
+Byte 1 of the 0x860B request payload (`00 <mode> 00 00 00 00`, data type `write`, sent to the outdoor unit) selects which record the outdoor unit sends. All answers use the same framing: byte 1 echoes the mode, bytes 2/3 are the record (or first slot) / last one, bytes 4/5 the packet / last packet, data from byte 6.
+
+| Mode | Content | Answer | Tested on our unit |
+|---|---|---|---|
+| 1 | Cycle data before the last error (layout above) | 30 records × 13 packets | yes, data |
+| 2 | Test run cycle data | 60 records × 13 packets | yes, empty (no test run stored) |
+| 3 | Error code history | 16 packets, 200 entries | yes, data (see below) |
+| 4 | Key input data | 5 packets, 200 bytes | yes, empty (all `FF`) |
+| 5 | Resets a counter according to the service tool | – | **not tested, do not send** |
+| 6 | Refrigerant cycle data | 6 records × 13 packets | yes, empty (all `FF`) |
+
+The stored data survives an error reset and power cuts. Communication errors (E201/E202) did not replace the cycle data of the last E438 on our unit.
+
+#### Error code history (0x860B mode 3)
+
+```yaml
+button:
+  - platform: template
+    name: Read outdoor error code history 0x860B
+    entity_category: diagnostic
+    on_press:
+      - samsung_nasa.send_structure:
+          nasa_device_id: nasa_device_2   # outdoor unit 10.00.00
+          message: 0x860B
+          data_type: write
+          payload: [0x00, 0x03, 0x00, 0x00, 0x00, 0x00]
+```
+
+The outdoor unit answers with 16 notification packets. Structure payload: `00 03`, first slot of this packet (`00`, `0D`, `1A`, … in steps of 13), `C7` (= last slot 199), `00 00`, then up to 13 entries of 3 bytes:
+
+| Byte | Content |
+|---|---|
+| 0 | error unit: `C8` (200) = outdoor unit, `00` = indoor/hydro unit codes |
+| 1 | error code, low byte |
+| 2 | error code, high byte (E438 = `B6 01`) |
+
+`FF FF FF` marks an empty slot. The buffer holds 200 entries, oldest first, without timestamps; new entries are appended at the end. On our unit 149 of 200 slots were used and the most recent entries matched the known sequence of E438/E466 errors of the last weeks in order. The error unit value 200 matches the "error unit" column of the cycle data (packet 0, byte 7).
+
 ## Climate Component
 
 The samsung_nasa platform extends to the climate component which can report current DHW (domestic hot water) temperature and room temperature if you use the Samsung wired controller as a thermostat. For DHW and heating you can control the target temperature and even bind select components to auto generate presets.
