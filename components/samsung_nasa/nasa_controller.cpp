@@ -83,6 +83,10 @@ void NASA_Controller::send_structure(const std::string &address, uint16_t number
   this->nasa_client_->publish_structure(address, number, (DataType) type, payload);
 }
 
+void NASA_Controller::write_as(const std::string &address, uint16_t number, long value, uint8_t type) {
+  this->nasa_client_->publish_value(address, number, value, (DataType) type);
+}
+
 void NASA_Controller::write(const std::string &address, const uint16_t &number, long value) {
   this->nasa_client_->publish_request(address, number, value);
 }

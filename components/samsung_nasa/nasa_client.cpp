@@ -293,6 +293,15 @@ void NASA_Client::publish_request(const std::string &address, uint16_t message, 
   this->dispatcher_.push(message);
 }
 
+void NASA_Client::publish_value(const std::string &address, uint16_t message, long value, DataType type) {
+  Packet packet = Packet::create_partial(Address::parse(address), type);
+  MessageSet message_set(message);
+  message_set.value = value;
+  packet.messages.push_back(message_set);
+  packet.log_multiline(std::string("Value"), log_lines_func);
+  this->publish_data(packet.command.packetNumber, packet.encode());
+}
+
 void NASA_Client::dump_config() {
   ESP_LOGCONFIG(TAG, "NASA Controller:");
   LOG_PIN("  Flow Control Pin: ", this->flow_control_pin_);
